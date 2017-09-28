@@ -26,7 +26,7 @@ sub eDumper {
     for my $arg (@_) {
         push @args, encode($ENCODING || 'utf8', $arg);
     }
-    _dump(@args);
+    return Encode::decode($ENCODING || 'utf8', _dump(@args));
 }
 
 sub encode {

@@ -1,11 +1,12 @@
 use strict;
 use warnings;
+use utf8;
 use Test::More 0.88;
 use Data::Dumper::AutoEncode;
 use Encode qw//;
 
 {
-    my $decoded_str = Encode::decode_utf8('富士は日本一の山');
+    my $decoded_str = '富士は日本一の山';
     like(
         Dumper($decoded_str),
         qr/\Q\x{5bcc}\x{58eb}\x{306f}\x{65e5}\x{672c}\x{4e00}\x{306e}\x{5c71}/,
@@ -16,7 +17,7 @@ use Encode qw//;
 }
 
 {
-    my $decoded_str = Encode::decode_utf8('富士は日本一の山');
+    my $decoded_str = '富士は日本一の山';
     my @hoge = ($decoded_str, $decoded_str);
     like(
         eDumper($decoded_str, $decoded_str),
@@ -27,7 +28,7 @@ use Encode qw//;
 
 {
     my $str = '富士は日本一の山';
-    Encode::from_to($str, 'utf8', 'CP932');
+    $str = Encode::encode('CP932', $str);
     my $decoded_str = Encode::decode('CP932', $str);
     like(
         Dumper($decoded_str),
@@ -48,7 +49,7 @@ use Encode qw//;
 
 {
     local $Data::Dumper::AutoEncode::CHECK_ALREADY_ENCODED = 1;
-    my $ret = eDumper({ Encode::decode_utf8('富士は日本一の山') => 'エベレストは世界一の山' });
+    my $ret = eDumper({ '富士は日本一の山' => Encode::encode('utf8', 'エベレストは世界一の山') });
     like $ret, qr/富士は日本一の山/, 'ex decoded';
     like $ret, qr/エベレストは世界一の山/, 'ex encoded';
 }
@@ -56,8 +57,8 @@ use Encode qw//;
 {
     local $Data::Dumper::AutoEncode::CHECK_ALREADY_ENCODED = 1;
     local $Data::Dumper::AutoEncode::FLAG_STR = 'auto_encoded:';
-    is eDumper(Encode::decode_utf8('富士は日本一の山')), q|$VAR1 = 'auto_encoded:富士は日本一の山';|."\n", 'FLAG_STR';
-    is eDumper('富士は日本一の山'), q|$VAR1 = '富士は日本一の山';|."\n", 'No FLAG_STR';
+    is eDumper('富士は日本一の山'), q|$VAR1 = 'auto_encoded:富士は日本一の山';|."\n", 'FLAG_STR';
+    is eDumper(Encode::encode('utf8', '富士は日本一の山')), q|$VAR1 = '富士は日本一の山';|."\n", 'No FLAG_STR';
 }
 
 done_testing;
